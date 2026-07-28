@@ -4,8 +4,10 @@ use App\Http\Controllers\Api\Admin\DriverController;
 use App\Http\Controllers\Api\Admin\StudentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampusPlaceController;
+use App\Http\Controllers\Api\DriverProfileController;
 use App\Http\Controllers\Api\FareSettingController;
 use App\Http\Controllers\Api\FavouriteController;
+use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\TripController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +22,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    Route::get('/student/profile', [StudentProfileController::class, 'show']);
+    Route::put('/student/profile', [StudentProfileController::class, 'update']);
+    Route::post('/student/profile/photo', [StudentProfileController::class, 'uploadPhoto']);
+
+    Route::get('/driver/profile', [DriverProfileController::class, 'show']);
+    Route::put('/driver/profile', [DriverProfileController::class, 'update']);
+    Route::post('/driver/profile/document', [DriverProfileController::class, 'uploadDocument']);
 
     Route::get('/fare-settings', [FareSettingController::class, 'show']);
 
