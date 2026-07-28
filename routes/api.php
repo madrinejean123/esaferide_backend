@@ -1,12 +1,19 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AuditLogController;
 use App\Http\Controllers\Api\Admin\DriverController;
+use App\Http\Controllers\Api\Admin\OverviewController;
+use App\Http\Controllers\Api\Admin\RatingController;
+use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\StudentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampusPlaceController;
+use App\Http\Controllers\Api\Admin\EmergencyController as AdminEmergencyController;
 use App\Http\Controllers\Api\DriverProfileController;
+use App\Http\Controllers\Api\EmergencyController;
 use App\Http\Controllers\Api\FareSettingController;
 use App\Http\Controllers\Api\FavouriteController;
+use App\Http\Controllers\Api\RideReportController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\TripController;
 use Illuminate\Http\Request;
@@ -35,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/trips', [TripController::class, 'index']);
     Route::post('/trips', [TripController::class, 'store']);
+    Route::post('/trips/rate', [TripController::class, 'rate']);
 
     Route::get('/favourites', [FavouriteController::class, 'index']);
     Route::post('/favourites', [FavouriteController::class, 'store']);
@@ -42,12 +50,27 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/campus-places', [CampusPlaceController::class, 'index']);
 
+    Route::post('/emergencies', [EmergencyController::class, 'store']);
+
+    Route::post('/ride-reports', [RideReportController::class, 'store']);
+    Route::post('/ride-reports/update', [RideReportController::class, 'update']);
+
     Route::middleware('admin')->group(function () {
         Route::put('/fare-settings', [FareSettingController::class, 'update']);
         Route::post('/campus-places', [CampusPlaceController::class, 'store']);
         Route::delete('/campus-places/{campusPlace}', [CampusPlaceController::class, 'destroy']);
 
         Route::prefix('admin')->group(function () {
+            Route::get('/overview', [OverviewController::class, 'index']);
+
+            Route::get('/audit', [AuditLogController::class, 'index']);
+            Route::get('/ratings', [RatingController::class, 'index']);
+
+            Route::get('/emergencies', [AdminEmergencyController::class, 'index']);
+            Route::post('/emergencies/{emergency}/status', [AdminEmergencyController::class, 'updateStatus']);
+
+            Route::get('/reports', [ReportController::class, 'index']);
+
             Route::get('/students', [StudentController::class, 'index']);
             Route::post('/students/{student}/suspend', [StudentController::class, 'suspend']);
             Route::post('/students/{student}/unsuspend', [StudentController::class, 'unsuspend']);

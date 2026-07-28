@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'ride_id', 'driver_user_id', 'student_user_id', 'student_firebase_uid',
     'duration_seconds', 'fare', 'pickup', 'destination', 'pickup_label', 'destination_label',
+    'student_rating_stars', 'student_rating_comment', 'student_rated_at',
+    'driver_rating_stars', 'driver_rating_comment', 'driver_rated_at',
 ])]
 class Trip extends Model
 {
@@ -18,6 +20,8 @@ class Trip extends Model
             'fare' => 'decimal:2',
             'pickup' => 'array',
             'destination' => 'array',
+            'student_rated_at' => 'datetime',
+            'driver_rated_at' => 'datetime',
         ];
     }
 

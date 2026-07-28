@@ -58,4 +58,42 @@ class TripController extends Controller
 
         return response()->json($trip, 201);
     }
+
+    // Called from the post-trip rating screens (student rates driver, driver
+    // rates student). Matched by ride_id since that's all those screens have.
+    public function rate(Request $request)
+    {
+        $data = $request->validate([
+            'ride_id' => ['required', 'string'],
+            'role' => ['required', 'in:student,driver'],
+            'stars' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string'],
+        ]);
+
+        $trip = Trip::where('ride_id', $data['ride_id'])->latest()->first();
+        if (! $trip) {
+            abort(404, 'Trip not found for this ride.');
+        }
+
+        $expectedUserId = $data['role'] === 'student' ? $trip->student_user_id : $trip->driver_user_id;
+        if ($expectedUserId !== $request->user()->id) {
+            abort(403, 'You are not a party to this trip.');
+        }
+
+        if ($data['role'] === 'student') {
+            $trip->update([
+                'student_rating_stars' => $data['stars'],
+                'student_rating_comment' => $data['comment'] ?? null,
+                'student_rated_at' => now(),
+            ]);
+        } else {
+            $trip->update([
+                'driver_rating_stars' => $data['stars'],
+                'driver_rating_comment' => $data['comment'] ?? null,
+                'driver_rated_at' => now(),
+            ]);
+        }
+
+        return $trip->fresh();
+    }
 }
