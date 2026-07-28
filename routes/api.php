@@ -9,35 +9,11 @@ use App\Http\Controllers\Api\FareSettingController;
 use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\TripController;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-// Temporary, token-gated bootstrap route for creating the first admin account
-// on hosts without shell access (e.g. Render's free tier). Remove after use.
-Route::post('/setup/admin', function (Request $request) {
-    abort_unless(
-        $request->header('X-Setup-Token') !== null
-            && hash_equals((string) env('ADMIN_SETUP_TOKEN'), (string) $request->header('X-Setup-Token')),
-        403
-    );
-
-    $data = $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'email'],
-        'password' => ['required', 'string', 'min:8'],
-    ]);
-
-    $user = User::updateOrCreate(
-        ['email' => $data['email']],
-        ['name' => $data['name'], 'password' => $data['password'], 'role' => 'admin']
-    );
-
-    return response()->json(['id' => $user->id, 'email' => $user->email, 'role' => $user->role], 201);
-});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
